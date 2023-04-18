@@ -13,10 +13,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err = l.Accept()
+	defer l.Close()
+	for {
+		var conn net.Conn
+		conn, err = l.Accept()
 
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+
+		go handleRequest(conn)
 	}
+}
+
+func handleRequest(conn net.Conn) {
+	conn.Write([]byte("+PONG\r\n"))
 }
